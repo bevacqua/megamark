@@ -1,0 +1,35 @@
+{
+  "name": "megamark",
+  "description": "Marked with easy tokenization, a fast highlighter, and a lean HTML sanitizer",
+  "homepage": "https://github.com/bevacqua/megamark",
+  "author": {
+    "name": "Nicolas Bevacqua",
+    "email": "nicolasbevacqua@gmail.com",
+    "url": "http://ponyfoo.com"
+  },
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/bevacqua/megamark.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bevacqua/megamark/issues"
+  },
+  "scripts": {
+    "test": "tape test/**/*.js"
+  },
+  "main": "./megamark",
+  "browser": {
+    "highlight.js": "highlight-redux"
+  },
+  "dependencies": {
+    "highlight-redux": "^1.0.1",
+    "highlight.js": "^8.4.0",
+    "highlight.js-tokens": "^1.0.0",
+    "insane": "^2.0.0",
+    "marked": "^0.3.3"
+  },
+  "devDependencies": {
+    "tape": "^3.5.0"
+  }
+}
