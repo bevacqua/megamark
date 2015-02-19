@@ -1,3 +1,3 @@
-# 1.0.0 IPO
+# 1.1.0 IPO
 
 - Initial Public Release
