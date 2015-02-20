@@ -54,8 +54,8 @@ function inline () {
 
 function fence () {
   var base = basefence.apply(this, arguments).substr(5); // starts with '<pre>'
-  var code = base.substr(0, 6) === '<code>'; // when the fence has no language
-  var rest = code ? '<code class="md-code">' + base.substr(6) : base;
+  var lang = base.substr(0, 6) !== '<code>'; // when the fence has a language class
+  var rest = lang ? base : '<code class="md-code">' + base.substr(6);
   var classed = '<pre class="md-code-block">' + rest;
   var aliased = classed.replace(ralias, aliasing);
   return aliased;
@@ -110,5 +110,6 @@ function markdown (input, options) {
   return html;
 }
 
+markdown.parser = md;
 markdown.languages = languages;
 module.exports = markdown;

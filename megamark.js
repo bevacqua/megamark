@@ -29,4 +29,5 @@ function megamark (md, options) {
 }
 
 markdown.languages.push('md-code', 'md-code-inline'); // only sanitizing purposes
+megamark.parser = markdown.parser;
 module.exports = megamark;
