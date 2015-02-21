@@ -23,11 +23,11 @@
     "highlight.js": "highlight-redux"
   },
   "dependencies": {
-    "assignment": "^1.0.0",
+    "assignment": "^2.0.0",
     "highlight-redux": "^1.0.1",
     "highlight.js": "^8.4.0",
     "highlight.js-tokens": "^1.0.0",
-    "insane": "^2.1.1",
+    "insane": "^2.1.2",
     "markdown-it": "^3.0.6"
   },
   "devDependencies": {
