@@ -1,3 +1,7 @@
+# 1.2.2 Insanity
+
+- Updated `insane` to `2.1.1`
+
 # 1.2.1 Assignments
 
 - Moved `assign()` into `assignment` npm module
