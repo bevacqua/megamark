@@ -2,7 +2,7 @@
 
 var marked = require('marked');
 var insane = require('insane');
-var assign = require('./assign');
+var assign = require('assignment');
 var markdown = require('./markdown');
 var hightokens = require('highlight.js-tokens').map(codeclass);
 

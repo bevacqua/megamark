@@ -7,7 +7,7 @@
     "email": "nicolasbevacqua@gmail.com",
     "url": "http://ponyfoo.com"
   },
-  "version": "1.2.0",
+  "version": "1.2.1",
   "repository": {
     "type": "git",
     "url": "git://github.com/bevacqua/megamark.git"
@@ -23,6 +23,7 @@
     "highlight.js": "highlight-redux"
   },
   "dependencies": {
+    "assignment": "^1.0.0",
     "highlight-redux": "^1.0.1",
     "highlight.js": "^8.4.0",
     "highlight.js-tokens": "^1.0.0",

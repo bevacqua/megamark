@@ -1,3 +1,7 @@
+# 1.2.1 Assignments
+
+- Moved `assign()` into `assignment` npm module
+
 # 1.2.0 Lexingtown
 
 - Replaced `marked` with `markdown-it`, improvements in compliance, parser speed, and code structure
