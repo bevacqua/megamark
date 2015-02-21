@@ -1,10 +1,10 @@
 # megamark
 
-> [marked][1] with easy tokenization, a fast highlighter, and a lean HTML sanitizer
+> [markdown-it][1] with easy tokenization, a fast highlighter, and a lean HTML sanitizer
 
-Megamark is [marked][1] plus a few reasonable factory defaults.
+Megamark is [markdown-it][1] plus a few reasonable factory defaults.
 
-- Markdown parsing via [marked][1]
+- Markdown parsing via [markdown-it][1]
 - HTML is sanitized via [insane][2], and _that's configurable_
 - Code is highlighted with [highlight.js][3] _(on a [diet in the client-side][4]!)_
 - Tokenization made easy: **turn those `@` mentions into links in no-time!**
@@ -18,7 +18,7 @@ npm install megamark --save
 
 # `megamark(markdown, options?)`
 
-The `markdown` input will be parsed via `marked`. Megamark configures `marked` for syntax highlighting, prefixing classes with `md-`. Output is sanitized via [insane][2], and you can configure the whitelisting process too.
+The `markdown` input will be parsed via `markdown-it`. Megamark configures `markdown-it` for syntax highlighting, prefixing classes with `md-`. Output is sanitized via [insane][2], and you can configure the whitelisting process too.
 
 ### `options.tokenizers`
 
@@ -49,19 +49,7 @@ The `transform` method will get all of the arguments of `text.match(token)`, so 
   - Matches one or more alphabet characters
 - Finally, `\b` means that we want to match everything up to a word boundary
 
-You can use any regular expression you want, but avoid the `g` modifier. You can opt to encode the output of `transform` by setting `encode: true` on the tokenizer, like below.
-
-```js
-{
-  tokenizers: [{
-    token: /a/,
-    encode: true,
-    transform: function (all) {
-      return '>>b<<';
-    }
-  }]
-}
-```
+You can use any regular expression you want, but avoid using the `g` modifier.
 
 ### `options.sanitizer`
 
@@ -71,7 +59,7 @@ These configuration options will be passed to [insane][2]. The defaults from [in
 
 MIT
 
-[1]: https://github.com/chjj/marked
+[1]: https://github.com/markdown-it/markdown-it
 [2]: https://github.com/bevacqua/insane
 [3]: https://github.com/isagalaev/highlight.js
 [4]: https://github.com/bevacqua/highlight-redux

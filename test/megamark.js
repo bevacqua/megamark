@@ -7,6 +7,8 @@ var stop = read('stop-breaking-the-web.md');
 var stopExpected = read('stop-breaking-the-web.html');
 var cross = read('cross-tab-communication.md');
 var crossExpected = read('cross-tab-communication.html');
+var snippets = read('code-snippets.md');
+var snippetsExpected = read('code-snippets.html');
 
 function read (name) {
   return fs.readFileSync('./test/fixtures/' + name, 'utf8');
@@ -14,6 +16,11 @@ function read (name) {
 
 test('empty doesn\'t blow up', function (t) {
   t.equal(megamark(), '');
+  t.end();
+});
+
+test('code snippets work as expected', function (t) {
+  t.equal(megamark(snippets), snippetsExpected);
   t.end();
 });
 
@@ -33,14 +40,6 @@ test('tokenizing works as expected', function (t) {
 
 test('tokenizer ignores encoding by default', function (t) {
   t.equal(megamark('_@bevacqua_', { tokenizers: [{ token: /(?:^|\s)@([A-z]+)\b/, transform: transform }] }), '<p><em><a href="/users/bevacqua">BEVACQUA</a></em></p>\n');
-  t.end();
-  function transform (text, username) {
-    return '<a href="/users/' + username + '">' + username.toUpperCase() + '</a>';
-  }
-});
-
-test('tokenizer can enforce encoding', function (t) {
-  t.equal(megamark('_@bevacqua_', { tokenizers: [{ token: /(?:^|\s)@([A-z]+)\b/, transform: transform, encode: true }] }), '<p><em>&#x3C;a href=&#x22;/users/bevacqua&#x22;&#x3E;BEVACQUA&#x3C;/a&#x3E;</em></p>\n');
   t.end();
   function transform (text, username) {
     return '<a href="/users/' + username + '">' + username.toUpperCase() + '</a>';
