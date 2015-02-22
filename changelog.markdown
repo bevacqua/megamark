@@ -1,3 +1,7 @@
+# 2.0.0 Token Nation
+
+- Simplified tokenization process
+
 # 1.3.0 Insane Asylum
 
 - Removed unused `marked` dependency

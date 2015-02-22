@@ -27,29 +27,29 @@ Tokenizers can help you transform bits of text like `@bevacqua` into links. This
 ```js
 megamark('Who is this @bevacqua person?', {
   tokenizers: [{
-    token: /(?:^|\s)@([A-z]+)\b/,
-    transform: function (all, username) {
-      return '<a href="/' + username + '">' + all + '</a>';
+    token: /(^|\s)@([A-z]+)\b/g,
+    transform: function (all, separator, username) {
+      return separator + '<a href="/' + username + '">' + all + '</a>';
     }
   }]
 });
 // <- '<p>Who is this <a href='/bevacqua'>@bevacqua</a> person?</p>\n'
 ```
 
-The `transform` method will get all of the arguments of `text.match(token)`, so the first argument will be `text`, followed by any captured groups. In our case, the `/(?:^|\s)@([A-z]+)\b/` can be decomposed as follows.
+The `transform` method will get all of the arguments of `text.match(token)`, so the first argument will be `text`, followed by any capturing groups. In our case, the `/(^|\s)@([A-z]+)\b/` can be decomposed as follows.
 
 - First off we have `(?:^|\s)`
-  - The parenthesis delimit a group
-  - The `?:` syntax means this is a non-capturing group, and it won't be passed to `transform`
+  - The parenthesis delimit a capturing group
+  - It'll be passed to transform as the second argument
   - `^|\s` means that we are looking to match either the start of input or a space character
   - We can't use `\b` instead of this expression because `@` is not a word character
 - Then there's the `@` literal
-- Another group, `([A-z]+)`
-  - This time it's a capturing group, meaning it'll be passed to transform as the second argument
+- Another capturing group, `([A-z]+)`
+  - It'll be passed to transform as the third argument
   - Matches one or more alphabet characters
 - Finally, `\b` means that we want to match everything up to a word boundary
 
-You can use any regular expression you want, but avoid using the `g` modifier.
+You can use any regular expression you want, but make sure to use the `g` modifier if you want to match multiples of any given token.
 
 ### `options.sanitizer`
 

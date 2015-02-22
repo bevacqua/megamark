@@ -90,15 +90,9 @@ function fanciful (text) {
 }
 
 function tokenize (text, tokenizers) {
-  var result = text;
-  tokenizers.forEach(use);
-  return result;
-  function use (tok) {
-    var match = result.match(tok.token);
-    while (match !== null) {
-      result = tok.transform.apply(null, match);
-      match = result.match(tok.token);
-    }
+  return tokenizers.reduce(use, text);
+  function use (result, tok) {
+    return result.replace(tok.token, tok.transform);
   }
 }
 
