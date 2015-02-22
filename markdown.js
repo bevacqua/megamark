@@ -21,13 +21,12 @@ var baseblock = md.renderer.rules.code_block;
 var baseinline = md.renderer.rules.code_inline;
 var basefence = md.renderer.rules.fence;
 var basetext = md.renderer.rules.text;
-var textcached = text([]);
+var textcached = textparser([]);
 var languages = [];
 
 md.renderer.rules.code_block = block;
 md.renderer.rules.code_inline = inline;
 md.renderer.rules.fence = fence;
-md.renderer.rules.text = text;
 
 hljs.configure({ tabReplace: 2, classPrefix: 'md-code-' });
 
@@ -70,8 +69,8 @@ function aliasing (all, language) {
   return ' class="md-code ' + lang + '"';
 }
 
-function text (tokenizers) {
-  return function text () {
+function textparser (tokenizers) {
+  return function parseText () {
     var base = basetext.apply(this, arguments);
     var fancy = fanciful(base);
     var tokenized = tokenize(fancy, tokenizers);
@@ -99,7 +98,7 @@ function tokenize (text, tokenizers) {
 function markdown (input, options) {
   var tok = options && options.tokenizers || [];
   var valid = input === null || input === void 0 ? '' : String(input);
-  md.renderer.rules.text = tok.length ? text(tok) : textcached;
+  md.renderer.rules.text = tok.length ? textparser(tok) : textcached;
   var html = md.render(valid);
   return html;
 }
