@@ -1,6 +1,5 @@
 'use strict';
 
-var marked = require('marked');
 var insane = require('insane');
 var assign = require('assignment');
 var markdown = require('./markdown');
