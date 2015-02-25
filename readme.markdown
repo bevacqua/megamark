@@ -8,6 +8,7 @@ Megamark is [markdown-it][1] plus a few reasonable factory defaults.
 - HTML is sanitized via [insane][2], and _that's configurable_
 - Code is highlighted with [highlight.js][3] _(on a [diet in the client-side][4]!)_
 - Tokenization made easy: **turn those `@` mentions into links in no-time!**
+- Text gets prettified just like you're used to from [marked's `smartypants`][5]
 - Still manages to produce a small footprint
 
 # Install
@@ -63,3 +64,4 @@ MIT
 [2]: https://github.com/bevacqua/insane
 [3]: https://github.com/isagalaev/highlight.js
 [4]: https://github.com/bevacqua/highlight-redux
+[5]: https://github.com/chjj/marked#smartypants
