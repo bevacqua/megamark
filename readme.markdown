@@ -81,7 +81,7 @@ megamark('http://localhost:9000/bevacqua/stompflow/issues/28', {
     return "<a href='" + href + "' class='issue-id'>#" + href.split('/').pop() + "</a>";
   }]
 });
-// <- '<p>@ponyfoo</p>\n'
+// <- '<p><a href='http://localhost:9000/bevacqua/stompflow/issues/28' class='issue-id'>#28</a></p>\n'
 ```
 
 ### `options.sanitizer`
