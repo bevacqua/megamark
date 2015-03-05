@@ -56,3 +56,70 @@ test('markdown defaults to ignoring hazardous elements, but that can be overridd
     return username.toUpperCase();
   }
 });
+
+test('tokenizing links allows me to return no content', function (t) {
+  t.equal(megamark('ponyfoo.com', { linkifiers: [linkify] }), '<p></p>\n');
+  t.end();
+  function linkify (href, text) {
+    return '';
+  }
+});
+
+test('tokenizing links allows me to return plain text content', function (t) {
+  t.equal(megamark('ponyfoo.com', { linkifiers: [linkify] }), '<p>@ponyfoo</p>\n');
+  t.end();
+  function linkify (href, text) {
+    return '@' + text.split('.').shift();
+  }
+});
+
+test('tokenizing links allows me to return any tags I want', function (t) {
+  t.equal(megamark('ponyfoo.com', { linkifiers: [linkify] }), '<p><em>http://ponyfoo.com</em></p>\n');
+  t.end();
+  function linkify (href, text) {
+    return '<em>' + href + '</em>';
+  }
+});
+
+test('tokenizing links allows me to ignore _some_ things', function (t) {
+  t.equal(megamark('ponyfoo.com google.com', { linkifiers: [linkify] }), '<p><em>http://ponyfoo.com</em> </p>\n');
+  t.end();
+  function linkify (href, text) {
+    if (/\/\/google\.com/.test(href)) {
+      return '';
+    }
+    return '<em>' + href + '</em>';
+  }
+});
+
+test('tokenizing links allows me to return any tags I want', function (t) {
+  t.equal(megamark('http://localhost:9000/bevacqua/stompflow/issues/28', { linkifiers: [linkify] }), '<p><a href="http://localhost:9000/bevacqua/stompflow/issues/28">#28</a></p>\n');
+  t.end();
+  function linkify (href, text) {
+    return '<a href=' + href + '>#' + href.split('/').pop() + '</a>';
+  }
+});
+
+test('tokenizing links doesn\'t break protocol', function (t) {
+  t.equal(megamark('//localhost:9000/bevacqua/stompflow/issues/28', { linkifiers: [linkify] }), '<p><a href="//localhost:9000/bevacqua/stompflow/issues/28">#28</a></p>\n');
+  t.end();
+  function linkify (href, text) {
+    return '<a href=' + href + '>#' + href.split('/').pop() + '</a>';
+  }
+});
+
+test('tokenizing links doesn\'t break protocol', function (t) {
+  t.equal(megamark('www.stompflow.com/bevacqua/stompflow/issues/28', { linkifiers: [linkify] }), '<p><a href="http://www.stompflow.com/bevacqua/stompflow/issues/28">#28</a></p>\n');
+  t.end();
+  function linkify (href, text) {
+    return '<a href=' + href + '>#' + href.split('/').pop() + '</a>';
+  }
+});
+
+test('tokenizing links doesn\'t break protocol', function (t) {
+  t.equal(megamark('https://localhost:9000/bevacqua/stompflow/issues/28', { linkifiers: [linkify] }), '<p><a href="https://localhost:9000/bevacqua/stompflow/issues/28">#28</a></p>\n');
+  t.end();
+  function linkify (href, text) {
+    return '<a href=' + href + '>#' + href.split('/').pop() + '</a>';
+  }
+});

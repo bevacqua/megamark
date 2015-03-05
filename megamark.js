@@ -21,9 +21,9 @@ function sanitize (html, options) {
 }
 
 function megamark (md, options) {
-  var user = options || {};
-  var html = markdown(md, { tokenizers: user.tokenizers });
-  var sane = sanitize(html, user.sanitizer);
+  var o = options || {};
+  var html = markdown(md, o);
+  var sane = sanitize(html, o.sanitizer);
   return sane;
 }
 
