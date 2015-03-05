@@ -52,6 +52,38 @@ The `transform` method will get all of the arguments of `text.match(token)`, so 
 
 You can use any regular expression you want, but make sure to use the `g` modifier if you want to match multiples of any given token.
 
+### `options.linkifiers`
+
+Linkifiers are a simpler kind of tokenizer, but they're also more limited. Instead of asking you for a token expression, linkifiers will run on every single user-provided link _(that's in plain text, such as `ponyfoo.com`, note that actual links such as `[ponyfoo](http://ponyfoo.com)` won't be affected by this)_. If an HTML string is returned from your linkifier, then that'll be used. If none of your linkifiers return an HTML string, then the original functionality of converting the link text into an HTML link will be used.
+
+Linkifiers are run one by one. The first linkifier to return a string will stop the rest of the linkifiers from ever running. Each linkifier receives an `href` argument and a `text` argument, containing the actual link and the text that should go in the link. These are just hints, you can return arbitrary HTML from your linkifier method, even something other than anchor links.
+
+###### Example
+
+Return `''` when you want to completely ignore a link. Maybe use a condition where you whitelist links from origins you're happy with.
+
+```js
+megamark('ponyfoo.com', {
+  linkifiers: [function (href, text) {
+    return '';
+  }]
+});
+// <- '<p></p>\n'
+```
+
+###### Example
+
+A real use case for this type of tokenizer is prettifying the text on the link. This is particularly useful for links on your own domain. The example below converts links that would be turned into `<a href='http://localhost:9000/bevacqua/stompflow/issues/28'>http://localhost:9000/bevacqua/stompflow/issues/28</a>` into `<a href='http://localhost:9000/bevacqua/stompflow/issues/28' class='issue-id'>#28</a>` instead.
+
+```js
+megamark('http://localhost:9000/bevacqua/stompflow/issues/28', {
+  linkifiers: [function (href, text) {
+    return "<a href='" + href + "' class='issue-id'>#" + href.split('/').pop() + "</a>";
+  }]
+});
+// <- '<p>@ponyfoo</p>\n'
+```
+
 ### `options.sanitizer`
 
 These configuration options will be passed to [insane][2]. The defaults from [insane][2] are used by default.

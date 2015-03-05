@@ -2,6 +2,7 @@
 
 var MarkdownIt = require('markdown-it');
 var hljs = require('highlight.js');
+var tokenizeLinks = require('./tokenizeLinks');
 var md = new MarkdownIt({
   html: true,
   xhtmlOut: true,
@@ -23,7 +24,9 @@ var basefence = md.renderer.rules.fence;
 var basetext = md.renderer.rules.text;
 var textcached = textparser([]);
 var languages = [];
+var context = {};
 
+md.core.ruler.before('linkify', 'linkify-tokenizer', linkifyTokenizer, {});
 md.renderer.rules.code_block = block;
 md.renderer.rules.code_inline = inline;
 md.renderer.rules.fence = fence;
@@ -88,6 +91,10 @@ function fanciful (text) {
     .replace(/\.{3}/g, '\u2026');                        // ellipses
 }
 
+function linkifyTokenizer (state) {
+  tokenizeLinks(state, context);
+}
+
 function tokenize (text, tokenizers) {
   return tokenizers.reduce(use, text);
   function use (result, tok) {
@@ -96,8 +103,11 @@ function tokenize (text, tokenizers) {
 }
 
 function markdown (input, options) {
-  var tok = options && options.tokenizers || [];
+  var tok = options.tokenizers || [];
+  var lin = options.linkifiers || [];
   var valid = input === null || input === void 0 ? '' : String(input);
+  context.tokenizers = tok;
+  context.linkifiers = lin;
   md.renderer.rules.text = tok.length ? textparser(tok) : textcached;
   var html = md.render(valid);
   return html;

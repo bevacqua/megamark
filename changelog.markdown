@@ -1,3 +1,7 @@
+# 2.1.0 Linked Data
+
+- Introduced `linkifiers` as another easy tokenizer option
+
 # 2.0.0 Token Nation
 
 - Simplified tokenization process
