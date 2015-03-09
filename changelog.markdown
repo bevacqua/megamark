@@ -1,3 +1,7 @@
+# 2.1.1 Mega Consistent
+
+- Freezing `markdown-it@3.0.7` for the time being
+
 # 2.1.0 Linked Data
 
 - Introduced `linkifiers` as another easy tokenizer option

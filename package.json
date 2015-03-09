@@ -7,7 +7,7 @@
     "email": "nicolasbevacqua@gmail.com",
     "url": "http://ponyfoo.com"
   },
-  "version": "2.1.0",
+  "version": "2.1.1",
   "repository": {
     "type": "git",
     "url": "git://github.com/bevacqua/megamark.git"
@@ -29,7 +29,7 @@
     "highlight.js-tokens": "^1.0.0",
     "insane": "^2.1.2",
     "linkify-it": "^0.1.2",
-    "markdown-it": "^3.0.7"
+    "markdown-it": "3.0.7"
   },
   "devDependencies": {
     "tape": "^3.5.0"
