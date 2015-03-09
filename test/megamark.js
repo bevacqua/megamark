@@ -127,5 +127,6 @@ test('italics work as expected', function (t) {
   t.equal(megamark('_some_'), '<p><em>some</em></p>\n');
   t.equal(megamark('_(some)_'), '<p><em>(some)</em></p>\n');
   t.equal(megamark('_(#)_'), '<p><em>(#)</em></p>\n');
+  t.equal(megamark('_(#)_', {}), '<p><em>(#)</em></p>\n');
   t.end();
 });
