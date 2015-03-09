@@ -1,4 +1,4 @@
-# 2.1.1 Mega Consistent
+# 2.1.2 Mega Consistent
 
 - Freezing `markdown-it@3.0.7` for the time being
 
