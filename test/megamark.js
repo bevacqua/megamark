@@ -3,12 +3,6 @@
 var fs = require('fs');
 var test = require('tape');
 var megamark = require('..');
-var stop = read('stop-breaking-the-web.md');
-var stopExpected = read('stop-breaking-the-web.html');
-var cross = read('cross-tab-communication.md');
-var crossExpected = read('cross-tab-communication.html');
-var snippets = read('code-snippets.md');
-var snippetsExpected = read('code-snippets.html');
 
 function read (name) {
   return fs.readFileSync('./test/fixtures/' + name, 'utf8');
@@ -20,13 +14,18 @@ test('empty doesn\'t blow up', function (t) {
 });
 
 test('code snippets work as expected', function (t) {
-  t.equal(megamark(snippets), snippetsExpected);
+  t.equal(megamark(read('code-snippets.md')), read('code-snippets.html'));
+  t.end();
+});
+
+test('emphasis works as expected', function (t) {
+  t.equal(megamark(read('barkup.md')), read('barkup.html'));
   t.end();
 });
 
 test('parsing of ponyfoo articles works as expected', function (t) {
-  t.equal(megamark(stop), stopExpected);
-  t.equal(megamark(cross), crossExpected);
+  t.equal(megamark(read('stop-breaking-the-web.md')), read('stop-breaking-the-web.html'));
+  t.equal(megamark(read('cross-tab-communication.md')), read('cross-tab-communication.html'));
   t.end();
 });
 
@@ -122,4 +121,11 @@ test('tokenizing links doesn\'t break protocol', function (t) {
   function linkify (href, text) {
     return '<a href=' + href + '>#' + href.split('/').pop() + '</a>';
   }
+});
+
+test('italics work as expected', function (t) {
+  t.equal(megamark('_some_'), '<p><em>some</em></p>\n');
+  t.equal(megamark('_(some)_'), '<p><em>(some)</em></p>\n');
+  t.equal(megamark('_(#)_'), '<p><em>(#)</em></p>\n');
+  t.end();
 });
