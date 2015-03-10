@@ -1,3 +1,7 @@
+# 2.1.3 Bow Tie
+
+- Added to Bower registry
+
 # 2.1.2 Mega Consistent
 
 - Freezing `markdown-it@3.0.7` for the time being
