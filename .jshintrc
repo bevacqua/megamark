@@ -10,6 +10,7 @@
   "strict": true,
   "node": true,
   "immed": true,
+  "validthis": true,
   "globals": {
     "jasmine": false,
     "describe": false,

@@ -44,12 +44,12 @@ function tokenizeLinks (state, context) {
     tokens = blockTokens[j].children;
     htmlLinkLevel = 0;
 
-    // We scan from the end, to keep position when new tags added.
-    // Use reversed logic in links start/end match
+    // we scan from the end, to keep position when new tags added.
+    // use reversed logic in links start/end match
     for (i = tokens.length - 1; i >= 0; i--) {
       token = tokens[i];
 
-      // Skip content of markdown links
+      // skip content of markdown links
       if (token.type === 'link_close') {
         i--;
         while (tokens[i].level !== token.level && tokens[i].type !== 'link_open') {
@@ -97,10 +97,7 @@ function tokenizeLinks (state, context) {
 
         html = null;
 
-        context.linkifiers.some(function runUserLinkifier (linkifier) {
-          html = linkifier(links[ln].url, links[ln].text);
-          return typeof html === 'string';
-        });
+        context.linkifiers.some(runUserLinkifier);
 
         if (typeof html === 'string') {
           nodes.push({
@@ -140,6 +137,11 @@ function tokenizeLinks (state, context) {
 
       blockTokens[j].children = tokens = arrayReplaceAt(tokens, i, nodes);
     }
+  }
+
+  function runUserLinkifier (linkifier) {
+    html = linkifier(links[ln].url, links[ln].text);
+    return typeof html === 'string';
   }
 }
 

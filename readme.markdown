@@ -17,6 +17,10 @@ Megamark is [markdown-it][1] plus a few reasonable factory defaults.
 npm install megamark --save
 ```
 
+```shell
+bower install megamark --save
+```
+
 # `megamark(markdown, options?)`
 
 The `markdown` input will be parsed via `markdown-it`. Megamark configures `markdown-it` for syntax highlighting, prefixing classes with `md-`. Output is sanitized via [insane][2], and you can configure the whitelisting process too.
