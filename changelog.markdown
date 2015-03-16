@@ -1,3 +1,7 @@
+# 2.1.4 Tie Down
+
+- Updated `assignment` to play nice with IE < 9
+
 # 2.1.3 Bow Tie
 
 - Added to Bower registry
