@@ -1,3 +1,8 @@
+# 2.1.5 Sanity Squatter
+
+- Fixed a bug where you couldn't customize the allowed `<span>`, `<code>`, and `<pre>` class names on the sanitizer level
+- Updated `insane@2.2.0`
+
 # 2.1.4 Tie Down
 
 - Updated `assignment` to play nice with IE < 9

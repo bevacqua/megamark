@@ -9,15 +9,19 @@ function codeclass (token) {
   return 'md-code-' + token;
 }
 
-function sanitize (html, options) {
-  var configuration = assign({}, options, {
-    allowedClasses: {
-      pre: ['md-code-block'],
-      code: markdown.languages,
-      span: hightokens
-    }
-  });
-  return insane(html, configuration);
+function sanitize (html, o) {
+  var options = assign({ allowedClasses: {} }, o);
+  var ac = options.allowedClasses;
+
+  add('pre', ['md-code-block']);
+  add('code', markdown.languages);
+  add('span', hightokens);
+
+  return insane(html, options);
+
+  function add (type, more) {
+    ac[type] = (ac[type] || []).concat(more);
+  }
 }
 
 function megamark (md, options) {
