@@ -1,3 +1,7 @@
+# 2.1.6 Sanity Vanity
+
+- Updated `insane@2.3.0`
+
 # 2.1.5 Sanity Squatter
 
 - Fixed a bug where you couldn't customize the allowed `<span>`, `<code>`, and `<pre>` class names on the sanitizer level
