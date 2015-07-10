@@ -35,6 +35,9 @@
     "markdown-it": "3.0.7"
   },
   "devDependencies": {
-    "tape": "3.5.0"
+    "browserify": "10.2.6",
+    "jshint": "2.8.0",
+    "tape": "3.5.0",
+    "uglify-js": "2.4.23"
   }
 }
