@@ -1,6 +1,6 @@
-# 2.1.6 Sanity Vanity
+# 2.1.7 Sanity Vanity
 
-- Updated `insane@2.3.0`
+- Updated `insane@2.4.0`
 
 # 2.1.5 Sanity Squatter
 
