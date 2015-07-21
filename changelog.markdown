@@ -1,4 +1,4 @@
-# 3.0.0 Mark
+# 3.0.1 Mark
 
 - `<mark>` elements can be used to highlight code, text
 - Updated `insane@2.4.2`

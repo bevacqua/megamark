@@ -57,8 +57,8 @@ function mark (code, encoded) {
     opentag = encode(opentag);
     closetag = encode(closetag);
   }
-  var ropen = new RegExp(opentag);
-  var rclose = new RegExp(closetag);
+  var ropen = new RegExp(opentag, 'g');
+  var rclose = new RegExp(closetag, 'g');
   var open = 'highlightmarkisveryliteral';
   var close = 'highlightmarkwasveryliteral';
   return code.replace(ropen, open).replace(rclose, close);
