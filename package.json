@@ -32,7 +32,7 @@
     "highlight.js-tokens": "1.0.0",
     "insane": "2.4.2",
     "linkify-it": "0.1.2",
-    "markdown-it": "4.0.3"
+    "markdown-it": "4.4.0"
   },
   "devDependencies": {
     "browserify": "10.2.6",
