@@ -123,6 +123,26 @@ test('tokenizing links doesn\'t break protocol', function (t) {
   }
 });
 
+test('links work as expected', function (t) {
+  t.equal(
+    megamark('[asd](http://localhost:3000/author/compose)'),
+    '<p><a href="http://localhost:3000/author/compose">asd</a></p>\n'
+  );
+  t.equal(
+    megamark('[asd](/author/compose)'),
+    '<p><a href="/author/compose">asd</a></p>\n'
+  );
+  t.equal(
+    megamark('[asd][1]\n\n[1]: /author/compose'),
+    '<p><a href="/author/compose">asd</a></p>\n'
+  );
+  t.equal(
+    megamark('Get half off my **JavaScript Application Design** book today! Enter code **dotd072115au** at [bevacqua.io/bf/book](http://localhost:3000/author/compose) when checking out. If you run into any issues, let me know.'),
+    '<p>Get half off my <strong>JavaScript Application Design</strong> book today! Enter code <strong>dotd072115au</strong> at <a href="http://localhost:3000/author/compose">bevacqua.io/bf/book</a> when checking out. If you run into any issues, let me know.</p>\n'
+  );
+  t.end();
+});
+
 test('italics work as expected', function (t) {
   t.equal(megamark('_some_'), '<p><em>some</em></p>\n');
   t.equal(megamark('_(some)_'), '<p><em>(some)</em></p>\n');

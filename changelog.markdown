@@ -1,3 +1,7 @@
+# 3.0.3 Murky
+
+- Upgraded `markdown-it` to `4.4.0`
+
 # 3.0.1 Mark
 
 - `<mark>` elements can be used to highlight code, text
