@@ -1,4 +1,4 @@
-# 3.0.3 Murky
+# 3.0.4 Murky
 
 - Upgraded `markdown-it` to `4.4.0`
 

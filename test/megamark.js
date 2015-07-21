@@ -18,6 +18,11 @@ test('code snippets work as expected', function (t) {
   t.end();
 });
 
+test('email link works as expected', function (t) {
+  t.equal(megamark(read('email-example.md')), read('email-example.html'));
+  t.end();
+});
+
 test('emphasis works as expected', function (t) {
   t.equal(megamark(read('barkup.md')), read('barkup.html'));
   t.end();
