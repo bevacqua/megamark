@@ -131,3 +131,27 @@ test('italics work as expected', function (t) {
   t.equal(megamark('_(#)_.', {}), '<p><em>(#)</em>.</p>\n');
   t.end();
 });
+
+test('mark highlights nodes, even within code', function (t) {
+  t.equal(
+    megamark('foo is <mark>marked..</mark>\n\n```html\n<mark><span>foo</span></mark>;\n```'),
+    '<p>foo is <mark class="md-mark">marked…</mark></p>\n<pre class="md-code-block"><code class="md-code md-lang-xml"><mark class="md-mark md-code-mark"><span class="md-code-tag">&lt;<span class="md-code-title">span</span>&gt;</span>foo<span class="md-code-tag">&lt;/<span class="md-code-title">span</span>&gt;</span></mark>;\n</code></pre>\n'
+  );
+  t.equal(
+    megamark('foo is <mark>marked..</mark>\n\n```js\n<mark><span>foo</span></mark>;\n```'),
+    '<p>foo is <mark class="md-mark">marked…</mark></p>\n<pre class="md-code-block"><code class="md-code md-lang-javascript"><mark class="md-mark md-code-mark">&lt;span&gt;foo&lt;/span&gt;</mark>;\n</code></pre>\n'
+  );
+  t.equal(
+    megamark('foo is <mark>marked..</mark>\n\n```\n<mark><span>foo</span></mark>;\n```'),
+    '<p>foo is <mark class="md-mark">marked…</mark></p>\n<pre class="md-code-block"><code class="md-code"><mark class="md-mark md-code-mark"><span>foo</span></mark>;\n</code></pre>\n'
+  );
+  t.equal(
+    megamark('asd\n\n`var foo = 1; <mark>foo = -10</mark>;`\n'),
+    '<p>asd</p>\n<p><code class="md-code md-code-inline">var foo = 1; <mark class="md-mark md-code-mark">foo = -10</mark>;</code></p>\n'
+  );
+  t.equal(
+    megamark('asd\n\n    <mark><span>foo</span></mark>'),
+    '<p>asd</p>\n<pre class="md-code-block"><code class="md-code"><mark class="md-mark md-code-mark">&lt;span&gt;foo&lt;/span&gt;</mark></code></pre>\n'
+  );
+  t.end();
+});

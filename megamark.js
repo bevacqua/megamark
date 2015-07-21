@@ -13,6 +13,7 @@ function sanitize (html, o) {
   var options = assign({ allowedClasses: {} }, o);
   var ac = options.allowedClasses;
 
+  add('mark', ['md-mark', 'md-code-mark']);
   add('pre', ['md-code-block']);
   add('code', markdown.languages);
   add('span', hightokens);

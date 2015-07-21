@@ -1,3 +1,9 @@
+# 3.0.0 Mark
+
+- `<mark>` elements can be used to highlight code, text
+- Updated `insane@2.4.2`
+- Upgraded `markdown-it` to `4.3.1`
+
 # 2.1.7 Sanity Vanity
 
 - Updated `insane@2.4.0`

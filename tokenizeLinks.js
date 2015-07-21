@@ -80,7 +80,7 @@ function tokenizeLinks (state, context) {
       lastPos = 0;
 
       for (ln = 0; ln < links.length; ln++) { // split string to nodes
-        if (!state.md.inline.validateLink(links[ln].url)) {
+        if (!state.md.validateLink(links[ln].url)) {
           continue;
         }
 

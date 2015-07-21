@@ -9,7 +9,7 @@ var md = new MarkdownIt({
   linkify: true,
   typographer: true,
   langPrefix: 'md-lang-alias-',
-  highlight: highlight
+  highlight: highlight.bind(null, false)
 });
 var ralias = / class="md-lang-alias-([^"]+)"/;
 var aliases = {
@@ -33,24 +33,59 @@ md.renderer.rules.fence = fence;
 
 hljs.configure({ tabReplace: 2, classPrefix: 'md-code-' });
 
-function highlight (code, lang) {
-  var lower = String(lang).toLowerCase();
+function highlight (encoded, code, detected) {
+  var lower = String(detected).toLowerCase();
+  var lang = aliases[detected] || detected;
+  var escaped = mark(code, encoded);
   try {
-    return hljs.highlight(aliases[lower] || lower, code).value;
+    var result = hljs.highlight(lang, escaped);
+    var unescaped = unmark(result.value, true, encoded);
+    return unescaped;
   } catch (e) {
-    return '';
+    return unmark(mark(code, encoded), true, encoded);
   }
+}
+
+function encode (tag) {
+  return tag.replace('<', '&lt;').replace('>', '&gt;');
+}
+
+function mark (code, encoded) {
+  var opentag = '<mark>';
+  var closetag = '</mark>';
+  if (encoded) {
+    opentag = encode(opentag);
+    closetag = encode(closetag);
+  }
+  var ropen = new RegExp(opentag);
+  var rclose = new RegExp(closetag);
+  var open = 'highlightmarkisveryliteral';
+  var close = 'highlightmarkwasveryliteral';
+  return code.replace(ropen, open).replace(rclose, close);
+}
+
+function unmark (value, inCode) {
+  var ropen = /highlightmarkisveryliteral/g;
+  var rclose = /highlightmarkwasveryliteral/g;
+  var classes = 'md-mark' + (inCode ? ' md-code-mark' : '');
+  var open = '<mark class="' + classes + '">';
+  var close = '</mark>';
+  return value.replace(ropen, open).replace(rclose, close);
 }
 
 function block () {
   var base = baseblock.apply(this, arguments).substr(11); // starts with '<pre><code>'
-  var classed = '<pre class="md-code-block"><code class="md-code">' + base;
+  var left = base.substr(0, base.length - 14);
+  var marked = highlight(true, base);
+  var classed = '<pre class="md-code-block"><code class="md-code">' + marked + '</code></pre>';
   return classed;
 }
 
 function inline () {
   var base = baseinline.apply(this, arguments).substr(6); // starts with '<code>'
-  var classed = '<code class="md-code md-code-inline">' + base;
+  var left = base.substr(0, base.length - 7); // ends with '</code>'
+  var marked = highlight(true, left);
+  var classed = '<code class="md-code md-code-inline">' + marked + '</code>';
   return classed;
 }
 
@@ -110,7 +145,7 @@ function markdown (input, options) {
   context.linkifiers = lin;
   md.renderer.rules.text = tok.length ? textparser(tok) : textcached;
   var html = md.render(valid);
-  return html;
+  return unmark(mark(html));
 }
 
 markdown.parser = md;
