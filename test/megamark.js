@@ -46,10 +46,10 @@ test('tokenizer ignores encoding by default', function (t) {
 });
 
 test('markdown defaults to ignoring hazardous elements, but that can be overridden', function (t) {
-  t.equal(megamark('<iframe>foo</iframe>'), '');
+  t.equal(megamark('<iframe>foo</iframe>'), '<p></p>\n');
   t.equal(megamark('<script>foo</script>'), '');
   t.equal(megamark('<style>foo</style>'), '');
-  t.equal(megamark('<iframe>foo</iframe>', { sanitizer: { allowedTags: ['iframe'] } }), '<iframe>foo</iframe>');
+  t.equal(megamark('<iframe>foo</iframe>', { sanitizer: { allowedTags: ['p', 'iframe'] } }), '<p><iframe>foo</iframe></p>\n');
   t.end();
   function transform (text, username) {
     return username.toUpperCase();
