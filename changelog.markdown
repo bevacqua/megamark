@@ -1,4 +1,4 @@
-# 3.0.5 Princess Zelda
+# 3.0.6 Princess Zelda
 
 - Fixed a bug where links would break a paragraph beyond repair
 
