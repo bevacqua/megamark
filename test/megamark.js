@@ -130,6 +130,10 @@ test('tokenizing links doesn\'t break protocol', function (t) {
 
 test('links work as expected', function (t) {
   t.equal(
+    megamark('ponyfoo.com and them something else'),
+    '<p><a href="http://ponyfoo.com">ponyfoo.com</a> and them something else</p>\n'
+  );
+  t.equal(
     megamark('[asd](http://localhost:3000/author/compose)'),
     '<p><a href="http://localhost:3000/author/compose">asd</a></p>\n'
   );

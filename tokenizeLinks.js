@@ -1,10 +1,5 @@
 'use strict';
 
-// the majority of this file was taken from markdown-it's linkify method
-// https://github.com/markdown-it/markdown-it/blob/9159018e2a446fc97eb3c6e509a8cdc4cc3c358a/lib/rules_core/linkify.js
-
-var linkify = require('linkify-it')();
-
 function arrayReplaceAt (a, i, middle) {
   var left = a.slice(0, i);
   var right = a.slice(i + 1);
@@ -19,130 +14,150 @@ function isLinkClose (str) {
   return /^<\/a\s*>/i.test(str);
 }
 
+// the majority of the code below was taken from markdown-it's linkify method
+// https://github.com/markdown-it/markdown-it/blob/7075e8881f4f717e2f2932ea156bb8aff649c89d/lib/rules_core/linkify.js
+
 function tokenizeLinks (state, context) {
-  var i;
-  var j;
-  var l;
-  var tokens;
-  var token;
-  var nodes;
-  var ln;
-  var text;
-  var pos;
-  var lastPos;
-  var level;
-  var links;
-  var htmlLinkLevel;
-  var blockTokens = state.tokens;
-  var html;
+  var i, j, l, tokens, token, currentToken, nodes, ln, text, pos, lastPos,
+      level, htmlLinkLevel, url, fullUrl, urlText,
+      blockTokens = state.tokens,
+      links;
+
+  if (!state.md.options.linkify) { return; }
 
   for (j = 0, l = blockTokens.length; j < l; j++) {
-    if (blockTokens[j].type !== 'inline') {
+    if (blockTokens[j].type !== 'inline' ||
+        !state.md.linkify.pretest(blockTokens[j].content)) {
       continue;
     }
 
     tokens = blockTokens[j].children;
+
     htmlLinkLevel = 0;
 
-    // we scan from the end, to keep position when new tags added.
-    // use reversed logic in links start/end match
+    // We scan from the end, to keep position when new tags added.
+    // Use reversed logic in links start/end match
     for (i = tokens.length - 1; i >= 0; i--) {
-      token = tokens[i];
+      currentToken = tokens[i];
 
-      // skip content of markdown links
-      if (token.type === 'link_close') {
+      // Skip content of markdown links
+      if (currentToken.type === 'link_close') {
         i--;
-        while (tokens[i].level !== token.level && tokens[i].type !== 'link_open') {
+        while (tokens[i].level !== currentToken.level && tokens[i].type !== 'link_open') {
           i--;
         }
         continue;
       }
 
-      if (token.type === 'html_inline') { // skip content of html tag links
-        if (isLinkOpen(token.content) && htmlLinkLevel > 0) {
+      // Skip content of html tag links
+      if (currentToken.type === 'html_inline') {
+        if (isLinkOpen(currentToken.content) && htmlLinkLevel > 0) {
           htmlLinkLevel--;
         }
-        if (isLinkClose(token.content)) {
+        if (isLinkClose(currentToken.content)) {
           htmlLinkLevel++;
         }
       }
-      if (htmlLinkLevel > 0) {
-        continue;
-      }
-      if (token.type !== 'text' || !linkify.test(token.content)) {
-        continue;
-      }
+      if (htmlLinkLevel > 0) { continue; }
 
-      text = token.content;
-      links = linkify.match(text);
-      nodes = [];
-      level = token.level;
-      lastPos = 0;
+      if (currentToken.type === 'text' && state.md.linkify.test(currentToken.content)) {
 
-      for (ln = 0; ln < links.length; ln++) { // split string to nodes
-        if (!state.md.validateLink(links[ln].url)) {
-          continue;
+        text = currentToken.content;
+        links = state.md.linkify.match(text);
+
+        // Now split string to nodes
+        nodes = [];
+        level = currentToken.level;
+        lastPos = 0;
+
+        for (ln = 0; ln < links.length; ln++) {
+
+          url = links[ln].url;
+          fullUrl = state.md.normalizeLink(url);
+          if (!state.md.validateLink(fullUrl)) { continue; }
+
+          urlText = links[ln].text;
+
+          // Linkifier might send raw hostnames like "example.com", where url
+          // starts with domain name. So we prepend http:// in those cases,
+          // and remove it afterwards.
+          //
+          if (!links[ln].schema) {
+            urlText = state.md.normalizeLinkText('http://' + urlText).replace(/^http:\/\//, '');
+          } else if (links[ln].schema === 'mailto:' && !/^mailto:/i.test(urlText)) {
+            urlText = state.md.normalizeLinkText('mailto:' + urlText).replace(/^mailto:/, '');
+          } else {
+            urlText = state.md.normalizeLinkText(urlText);
+          }
+
+          pos = links[ln].index;
+
+          if (pos > lastPos) {
+            token         = new state.Token('text', '', 0);
+            token.content = text.slice(lastPos, pos);
+            token.level   = level;
+            nodes.push(token);
+          }
+
+          //// <this code is part of megamark>
+          html = null;
+          context.linkifiers.some(runUserLinkifier);
+
+          if (typeof html === 'string') {
+            nodes.push({
+              type: 'html_block',
+              content: html,
+              level: level
+            });
+          } else {
+          //// </this code is part of megamark>
+
+            token         = new state.Token('link_open', 'a', 1);
+            token.attrs   = [ [ 'href', fullUrl ] ];
+            token.level   = level++;
+            token.markup  = 'linkify';
+            token.info    = 'auto';
+            nodes.push(token);
+
+            token         = new state.Token('text', '', 0);
+            token.content = urlText;
+            token.level   = level;
+            nodes.push(token);
+
+            token         = new state.Token('link_close', 'a', -1);
+            token.level   = --level;
+            token.markup  = 'linkify';
+            token.info    = 'auto';
+            nodes.push(token);
+
+          //// <this code is part of megamark>
+          }
+          //// </this code is part of megamark>
+
+          lastPos = links[ln].lastIndex;
         }
 
-        pos = links[ln].index;
-
-        if (pos > lastPos) {
-          level = level;
-          nodes.push({
-            type: 'text',
-            content: text.slice(lastPos, pos),
-            level: level
-          });
+        if (lastPos < text.length) {
+          token         = new state.Token('text', '', 0);
+          token.content = text.slice(lastPos);
+          token.level   = level;
+          nodes.push(token);
         }
 
-        html = null;
-
-        context.linkifiers.some(runUserLinkifier);
-
-        if (typeof html === 'string') {
-          nodes.push({
-            type: 'html_block',
-            content: html,
-            level: level
-          });
-        } else {
-          nodes.push({
-            type: 'link_open',
-            href: links[ln].url,
-            target: '',
-            title: '',
-            level: level++
-          });
-          nodes.push({
-            type: 'text',
-            content: links[ln].text,
-            level: level
-          });
-          nodes.push({
-            type: 'link_close',
-            level: --level
-          });
-        }
-
-        lastPos = links[ln].lastIndex;
+        // replace current node
+        blockTokens[j].children = tokens = arrayReplaceAt(tokens, i, nodes);
       }
-
-      if (lastPos < text.length) {
-        nodes.push({
-          type: 'text',
-          content: text.slice(lastPos),
-          level: level
-        });
-      }
-
-      blockTokens[j].children = tokens = arrayReplaceAt(tokens, i, nodes);
     }
   }
+
+  //// <this code is part of megamark>
+  var html;
 
   function runUserLinkifier (linkifier) {
     html = linkifier(links[ln].url, links[ln].text);
     return typeof html === 'string';
   }
+  //// </this code is part of megamark>
 }
 
 module.exports = tokenizeLinks;

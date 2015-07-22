@@ -1,3 +1,7 @@
+# 3.0.5 Princess Zelda
+
+- Fixed a bug where links would break a paragraph beyond repair
+
 # 3.0.4 Murky
 
 - Upgraded `markdown-it` to `4.4.0`
