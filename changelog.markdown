@@ -1,3 +1,7 @@
+# 3.0.7 Insane Asylum
+
+- Updated `insane@2.4.3`
+
 # 3.0.6 Princess Zelda
 
 - Fixed a bug where links would break a paragraph beyond repair
