@@ -10,7 +10,8 @@ function codeclass (token) {
 }
 
 function sanitize (html, o) {
-  var options = assign({ allowedClasses: {} }, o);
+  var headings = { h1: 'id', h2: 'id', h3: 'id', h4: 'id', h5: 'id', h6: 'id' };
+  var options = assign({ allowedClasses: {}, allowedAttributes: headings }, o);
   var ac = options.allowedClasses;
 
   add('mark', ['md-mark', 'md-code-mark']);

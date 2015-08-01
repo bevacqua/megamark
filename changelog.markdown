@@ -1,3 +1,8 @@
+# 3.1.0 Sluggish
+
+- Allows `id` attribute on any headings
+- Adds an `id` to all headings
+
 # 3.0.7 Insane Asylum
 
 - Updated `insane@2.4.3`

@@ -8,6 +8,10 @@ function read (name) {
   return fs.readFileSync('./test/fixtures/' + name, 'utf8');
 }
 
+function write (name, data) {
+  return fs.writeFileSync('./test/fixtures/' + name, data);
+}
+
 test('empty doesn\'t blow up', function (t) {
   t.equal(megamark(), '');
   t.end();
@@ -158,6 +162,17 @@ test('italics work as expected', function (t) {
   t.equal(megamark('_(#)_'), '<p><em>(#)</em></p>\n');
   t.equal(megamark('_(#)_.'), '<p><em>(#)</em>.</p>\n');
   t.equal(megamark('_(#)_.', {}), '<p><em>(#)</em>.</p>\n');
+  t.end();
+});
+
+test('headings work as expected', function (t) {
+  t.equal(megamark('# foo'), '<h1 id="foo">foo</h1>\n');
+  t.equal(megamark('## foo'), '<h2 id="foo">foo</h2>\n');
+  t.equal(megamark('## **foo**'), '<h2 id="foo"><strong>foo</strong></h2>\n');
+  t.equal(megamark('## **f _o_ o**'), '<h2 id="f-o-o"><strong>f <em>o</em> o</strong></h2>\n');
+  t.equal(megamark('<h1></h1>'), '<h1></h1>');
+  t.equal(megamark('<h1>a</h1>'), '<h1>a</h1>');
+  t.equal(megamark('<h1 id="foo">bar</h1>'), '<h1 id="foo">bar</h1>');
   t.end();
 });
 

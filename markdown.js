@@ -2,6 +2,7 @@
 
 var MarkdownIt = require('markdown-it');
 var hljs = require('highlight.js');
+var sluggish = require('sluggish');
 var tokenizeLinks = require('./tokenizeLinks');
 var md = new MarkdownIt({
   html: true,
@@ -27,6 +28,7 @@ var languages = [];
 var context = {};
 
 md.core.ruler.before('linkify', 'linkify-tokenizer', linkifyTokenizer, {});
+md.renderer.rules.heading_open = heading;
 md.renderer.rules.code_block = block;
 md.renderer.rules.code_inline = inline;
 md.renderer.rules.fence = fence;
@@ -71,6 +73,29 @@ function unmark (value, inCode) {
   var open = '<mark class="' + classes + '">';
   var close = '</mark>';
   return value.replace(ropen, open).replace(rclose, close);
+}
+
+function heading (tokens, i, options, env, renderer) {
+  var token = tokens[i];
+  var open = '<' + token.tag;
+  var close = '>';
+  var contents = read();
+  var slug = sluggish(contents);
+  if (slug.length) {
+    return open + ' id="' + slug + '"' + close;
+  }
+  return open + close;
+
+  function read () {
+    var index = i++;
+    var next = tokens[index];
+    var contents = '';
+    while (next && next.type !== 'heading_close') {
+      contents += next.content;
+      next = tokens[index++ + 1];
+    }
+    return contents;
+  }
 }
 
 function block () {
