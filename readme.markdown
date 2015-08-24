@@ -9,6 +9,8 @@ Megamark is [markdown-it][1] plus a few reasonable factory defaults.
 - Code is highlighted with [highlight.js][3] _(on a [diet in the client-side][4]!)_
 - Tokenization made easy: **turn those `@` mentions into links in no-time!**
 - Text gets prettified just like you're used to from [marked's `smartypants`][5]
+- You can highlight interesting content using `<mark>` tags, _even inside code blocks_
+- Headings get unique `id`, helping you implement navigation in your Markdown documents
 - Still manages to produce a small footprint
 
 # Install
