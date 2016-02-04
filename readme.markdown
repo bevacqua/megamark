@@ -107,7 +107,7 @@ megamark('**foo**', {
 // <- '<strong>[START]fo[END]o</strong>'
 ```
 
-<sub>Also note that, as shown in the example above, when a marker can't be placed in the output exactly where you asked for, it'll be cleanly placed nearby. In the above example, the `[START]` marker would've been placed somewhere inside the `<strong>` tag, but just after the opening tag finishes was preferred.</sub>
+<sub>Also note that, as shown in the example above, when a marker can't be placed in the output exactly where you asked for, it'll be cleanly placed nearby. In the above example, the `[START]` marker would've been placed _"somewhere inside"_ the opening `<strong>` tag, but right after the opening tag finishes was preferred.</sub>
 
 # License
 

@@ -1,4 +1,4 @@
-# 3.2.0 Mark Twain
+# 3.2.1 Mark Twain
 
 - Introduced for `markers` option, that can help preserve selection across parsing
 
