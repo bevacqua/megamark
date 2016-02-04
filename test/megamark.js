@@ -208,5 +208,19 @@ test('megamark understands markers', function (t) {
   t.equal(megamark('**foo**', { markers: [[1, '[START]'], [5, '[END]']] }), '<p><strong>[START]foo[END]</strong></p>\n');
   t.equal(megamark('**foo**', { markers: [[2, '[START]'], [4, '[END]']] }), '<p><strong>[START]fo[END]o</strong></p>\n');
   t.equal(megamark('`foo`\n\n> *bar*\n\n**baz**', { markers: [[2, '[START]'], [5, '[END]']] }), '<p><code class="md-code md-code-inline">f[START]oo[END]</code></p>\n<blockquote>\n<p><em>bar</em></p>\n</blockquote>\n<p><strong>baz</strong></p>\n');
+  t.equal(megamark('# markdown', { markers: [[3, '[START]'], [6, '[END]']] }), '<h1 id="markdown">m[START]ark[END]down</h1>\n');
+  t.equal(megamark('### markdown', { markers: [[5, '[START]'], [8, '[END]']] }), '<h3 id="markdown">m[START]ark[END]down</h3>\n');
+  t.equal(megamark('### markdown\n\n\n\n\n\n\n\n\nfoo bar baz', { markers: [[20, '[START]'], [23, '[END]']] }), '<h3 id="markdown">markdown</h3>\n<p>[START]fo[END]o bar baz</p>\n');
+  t.equal(megamark('<a href="/foo">bar</a>', { markers: [[16, '[START]'], [18, '[END]']] }), '<p><a href="/foo">b[START]ar[END]</a></p>\n');
+  t.equal(megamark('[bar](/foo)', { markers: [[2, '[START]'], [4, '[END]']] }), '<p><a href="/foo">b[START]ar[END]</a></p>\n');
+  t.equal(megamark('[bar][a]\n\n[a]: /foo', { markers: [[2, '[START]'], [4, '[END]']] }), '<p><a href="/foo">b[START]ar[END]</a></p>\n');
+  t.equal(megamark('![alt](/foo)', { markers: [[2, '[START]'], [4, '[END]']] }), '<p><img src="/foo" alt="[START]al[END]t"/></p>\n');
+  t.equal(megamark('![alt][a]\n\n[a]: /foo', { markers: [[2, '[START]'], [4, '[END]']] }), '<p><img src="/foo" alt="[START]al[END]t"/></p>\n');
+  t.equal(megamark('<img src="/foo" />', { markers: [[2, '[START]'], [4, '[END]']] }), '<img src="/foo"/>[START][END]');
+  t.end();
+});
+
+test('megamark understands markers in complex markdown', function (t) {
+  t.equal(megamark(read('woofmark-sample.md'), { markers: [[103, '[START]'], [172, '[END]']] }), read('woofmark-sample.html'));
   t.end();
 });

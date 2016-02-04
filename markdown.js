@@ -20,36 +20,92 @@ var aliases = {
   jade: 'css' // next best thing
 };
 
-md.core.ruler.push('pos_counter', function posCounter (state) {
+md.core.ruler.after('linkify', 'pos_counter', function posCounter (state) {
   var partial = state.src;
   var cursor = 0;
-  state.tokens.forEach(function crawl (token) {
+  state.tokens.forEach(function crawl (token, i) {
     token.cursorStart = cursor;
     if (token.markup) {
       moveCursor(token.markup);
     }
+    if (token.type === 'link_open') {
+      moveCursor('[');
+    }
+    if (token.type === 'link_close') {
+      moveCursorAfterLinkClose();
+    }
+    if (token.type === 'image') {
+      moveCursor('![');
+    }
     if (token.children) {
       token.children.forEach(crawl);
     } else if (token.content) {
-      moveCursor(token.content);
+      token.src = token.content;
+      moveCursor(token.src);
     }
-    if (token.type === 'code_inline') {
+    if (token.type === 'code_inline') { // closing mark
       moveCursor(token.markup);
+    }
+    if (token.type === 'heading_open') {
+      moveCursor('');
+    }
+    if (token.map) {
+      moveCursor('');
     }
     token.cursorEnd = cursor;
   });
 
   function moveCursor (needle) {
-    var re = new RegExp(escapeForRegExp(needle), 'ig');
+    var regex = needle instanceof RegExp;
+    var re = regex ? needle : new RegExp('^\\s*' + escapeForRegExp(needle), 'ig');
     var match = re.exec(partial);
     if (!match) {
-      return;
+      return false;
     }
     var diff = re.lastIndex;
     cursor += diff;
     partial = partial.slice(diff);
+    return true;
+  }
+
+  function moveCursorAfterLinkClose () {
+    moveCursor(']');
+    if (!moveCursor(/^\s*\[[^\]]+\]/g)) {
+      moveCursor('(');
+      moveCursorAfterParenthesis();
+    }
+  }
+
+  function moveCursorAfterParenthesis () {
+    var prev;
+    var char;
+    var i;
+    var inQuotes = false;
+    for (i = 0; i < partial.length; i++) {
+      prev = partial[i - 1] || '';
+      if (prev === '\\') { continue; }
+      char = partial[i];
+      if (!inQuotes && char === ')') { break; }
+      if (char === '"' || char === '\'') { inQuotes = !inQuotes; }
+    }
+    cursor += i + 1;
+    partial = partial.slice(i + 1);
   }
 });
+
+function repeat (text, times) {
+  var result = '', n;
+  while (n) {
+    if (n % 2 === 1) {
+      result += text;
+    }
+    if (n > 1) {
+      text += text;
+    }
+    n >>= 1;
+  }
+  return result;
+}
 
 function escapeForRegExp (text) { return text.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&'); }
 
@@ -144,7 +200,7 @@ function block (tokens, idx, options, env) {
 function inline (tokens, idx, options, env) {
   var base = baseinline.apply(this, arguments).substr(6); // starts with '<code>'
   var untagged = base.substr(0, base.length - 7); // ends with '</code>'
-  var upmarked = upmark(tokens[idx], untagged, -1, env);
+  var upmarked = upmark(tokens[idx], untagged, 1, env);
   var marked = highlight(true, upmarked);
   var classed = '<code class="md-code md-code-inline">' + marked + '</code>';
   return classed;
@@ -168,12 +224,13 @@ function upmark (token, content, offset, env) {
     .reduce(considerUpmarking, content);
 
   function considerUpmarking (content, marker) {
-    var start = env.flush ? 0 : Math.max(marker[0], token.cursorStart);
+    var startOffset = env.flush ? 0 : marker[0] - token.cursorStart;
+    var start = Math.max(0, startOffset - offset);
     var markerCode = consumeMarker(marker, env);
     return (
-      content.slice(0, start + offset) +
+      content.slice(0, start) +
         markerCode +
-      content.slice(start + offset)
+      content.slice(start)
     );
   }
 
@@ -216,28 +273,10 @@ function aliasing (all, language) {
 
 function textParser (tokens, idx, options, env) {
   var token = tokens[idx];
-  token.content = upmark(token, token.content, tokens.slice(0, idx).reduce(countMarks, 0), env);
+  token.content = upmark(token, token.content, 0, env);
   var base = basetext.apply(this, arguments);
-  var fancy = fancifulLong(fancifulShort(base));
-  var tokenized = tokenize(fancy, env.tokenizers);
+  var tokenized = tokenize(base, env.tokenizers);
   return tokenized;
-  function countMarks (acc, token) {
-    return acc - (token.markup ? token.markup.length : 0);
-  }
-}
-
-function fancifulShort (text) {
-  return text
-    .replace(/(^|[-\u2014/(\[{"\s])'/g, '$1\u2018')      // opening singles
-    .replace(/'/g, '\u2019')                             // closing singles & apostrophes
-    .replace(/(^|[-\u2014/(\[{\u2018\s])"/g, '$1\u201c') // opening doubles
-    .replace(/"/g, '\u201d');                            // closing doubles
-}
-
-function fancifulLong (text) {
-  return text
-    .replace(/--/g, '\u2014')                            // em-dashes
-    .replace(/\.{3}/g, '\u2026');                        // ellipses
 }
 
 function linkifyTokenizer (state) {

@@ -1,3 +1,7 @@
+# 3.2.2 Mark Zuckerberg
+
+- Fixed a number of issues with `markers` option, added tons of tests
+
 # 3.2.1 Mark Twain
 
 - Introduced for `markers` option, that can help preserve selection across parsing
