@@ -178,7 +178,7 @@ function upmark (token, content, offset, env) {
   }
 
   function pastOrPresent (marker) {
-    return marker[0] <= token.cursorEnd
+    return marker[0] <= token.cursorEnd;
   }
 }
 
