@@ -101,7 +101,7 @@ _Advanced option._ Setting markers to an array such as `[[0, 'START'], [10, 'END
 The following example shows how markers could be used to preserve a text selection across Markdown-into-HTML parsing, by providing markers for each cursor. When the output from `megamark` comes back, all you need to do is find your markers, remove them, and place the text selection at their indices. The [`woofmark`][6] Markdown/HTML/WYSIWYG editor module leverages this functionality to do exactly that.
 
 ```js
-domador('**foo**', {
+megamark('**foo**', {
   markers: [[1, '[START]'], [4, '[END]']]
 });
 // <- '<strong>[START]fo[END]o</strong>'
