@@ -94,6 +94,21 @@ megamark('http://localhost:9000/bevacqua/stompflow/issues/28', {
 
 These configuration options will be passed to [insane][2]. The defaults from [insane][2] are used by default.
 
+### `options.markers`
+
+_Advanced option._ Setting markers to an array such as `[[0, 'START'], [10, 'END']]` will place each of those markers in the output, based on the input index you want to track. This feature is necessary because there is no other reliable way of tracking a text cursor position before and after a piece of Markdown is converted to HTML.
+
+The following example shows how markers could be used to preserve a text selection across Markdown-into-HTML parsing, by providing markers for each cursor. When the output from `megamark` comes back, all you need to do is find your markers, remove them, and place the text selection at their indices. The [`woofmark`][6] Markdown/HTML/WYSIWYG editor module leverages this functionality to do exactly that.
+
+```js
+domador('**foo**', {
+  markers: [[1, '[START]'], [4, '[END]']]
+});
+// <- '<strong>[START]fo[END]o</strong>'
+```
+
+<sub>Also note that, as shown in the example above, when a marker can't be placed in the output exactly where you asked for, it'll be cleanly placed nearby. In the above example, the `[START]` marker would've been placed somewhere inside the `<strong>` tag, but just after the opening tag finishes was preferred.</sub>
+
 # License
 
 MIT
@@ -103,3 +118,4 @@ MIT
 [3]: https://github.com/isagalaev/highlight.js
 [4]: https://github.com/bevacqua/highlight-redux
 [5]: https://github.com/chjj/marked#smartypants
+[6]: https://github.com/bevacqua/woofmark

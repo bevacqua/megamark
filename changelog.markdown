@@ -1,3 +1,7 @@
+# 3.2.0 Mark Twain
+
+- Introduced for `markers` option, that can help preserve selection across parsing
+
 # 3.1.0 Sluggish
 
 - Allows `id` attribute on any headings

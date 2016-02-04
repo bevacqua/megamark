@@ -55,10 +55,10 @@ test('tokenizer ignores encoding by default', function (t) {
 });
 
 test('markdown defaults to ignoring hazardous elements, but that can be overridden', function (t) {
-  t.equal(megamark('<iframe>foo</iframe>'), '<p></p>\n');
+  t.equal(megamark('<iframe>foo</iframe>'), '');
   t.equal(megamark('<script>foo</script>'), '');
   t.equal(megamark('<style>foo</style>'), '');
-  t.equal(megamark('<iframe>foo</iframe>', { sanitizer: { allowedTags: ['p', 'iframe'] } }), '<p><iframe>foo</iframe></p>\n');
+  t.equal(megamark('<iframe>foo</iframe>', { sanitizer: { allowedTags: ['p', 'iframe'] } }), '<iframe>foo</iframe>');
   t.end();
   function transform (text, username) {
     return username.toUpperCase();
@@ -197,5 +197,16 @@ test('mark highlights nodes, even within code', function (t) {
     megamark('asd\n\n    <mark><span>foo</span></mark>'),
     '<p>asd</p>\n<pre class="md-code-block"><code class="md-code"><mark class="md-mark md-code-mark">&lt;span&gt;foo&lt;/span&gt;</mark></code></pre>\n'
   );
+  t.end();
+});
+
+test('megamark understands markers', function (t) {
+  t.equal(megamark('_foo_', { markers: [[0, '[START]'], [0, '[END]']] }), '[START][END]<p><em>foo</em></p>\n');
+  t.equal(megamark('_foo_', { markers: [[5, '[START]'], [5, '[END]']] }), '<p><em>foo</em>[START][END]</p>\n');
+  t.equal(megamark('_foo_', { markers: [[1, '[START]'], [5, '[END]']] }), '<p><em>[START]foo</em>[END]</p>\n');
+  t.equal(megamark('foo', { markers: [[1, '[START]'], [2, '[END]']] }), '<p>f[START]o[END]o</p>\n');
+  t.equal(megamark('**foo**', { markers: [[1, '[START]'], [5, '[END]']] }), '<p><strong>[START]foo[END]</strong></p>\n');
+  t.equal(megamark('**foo**', { markers: [[2, '[START]'], [4, '[END]']] }), '<p><strong>[START]fo[END]o</strong></p>\n');
+  t.equal(megamark('`foo`\n\n> *bar*\n\n**baz**', { markers: [[2, '[START]'], [5, '[END]']] }), '<p><code class="md-code md-code-inline">f[START]oo[END]</code></p>\n<blockquote>\n<p><em>bar</em></p>\n</blockquote>\n<p><strong>baz</strong></p>\n');
   t.end();
 });

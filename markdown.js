@@ -19,32 +19,66 @@ var aliases = {
   html: 'xml', // next best thing
   jade: 'css' // next best thing
 };
+
+md.core.ruler.push('pos_counter', function posCounter (state) {
+  var partial = state.src;
+  var cursor = 0;
+  state.tokens.forEach(function crawl (token) {
+    token.cursorStart = cursor;
+    if (token.markup) {
+      moveCursor(token.markup);
+    }
+    if (token.children) {
+      token.children.forEach(crawl);
+    } else if (token.content) {
+      moveCursor(token.content);
+    }
+    if (token.type === 'code_inline') {
+      moveCursor(token.markup);
+    }
+    token.cursorEnd = cursor;
+  });
+
+  function moveCursor (needle) {
+    var re = new RegExp(escapeForRegExp(needle), 'ig');
+    var match = re.exec(partial);
+    if (!match) {
+      return;
+    }
+    var diff = re.lastIndex;
+    cursor += diff;
+    partial = partial.slice(diff);
+  }
+});
+
+function escapeForRegExp (text) { return text.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&'); }
+
 var baseblock = md.renderer.rules.code_block;
 var baseinline = md.renderer.rules.code_inline;
 var basefence = md.renderer.rules.fence;
 var basetext = md.renderer.rules.text;
-var textcached = textparser([]);
+var baserenderInline = md.renderer.renderInline;
 var languages = [];
-var context = {};
 
 md.core.ruler.before('linkify', 'linkify-tokenizer', linkifyTokenizer, {});
 md.renderer.rules.heading_open = heading;
 md.renderer.rules.code_block = block;
 md.renderer.rules.code_inline = inline;
 md.renderer.rules.fence = fence;
+md.renderer.renderInline = renderInline;
 
 hljs.configure({ tabReplace: 2, classPrefix: 'md-code-' });
 
 function highlight (encoded, code, detected) {
   var lower = String(detected).toLowerCase();
   var lang = aliases[detected] || detected;
-  var escaped = mark(code, encoded);
+  var escaped = encodeHtmlMarks(code, encoded);
   try {
     var result = hljs.highlight(lang, escaped);
-    var unescaped = unmark(result.value, true, encoded);
+    var unescaped = decodeHtmlMarks(result.value, true, encoded);
     return unescaped;
   } catch (e) {
-    return unmark(mark(code, encoded), true, encoded);
+    return decodeHtmlMarks(encodeHtmlMarks(code, encoded), true, encoded);
   }
 }
 
@@ -52,7 +86,7 @@ function encode (tag) {
   return tag.replace('<', '&lt;').replace('>', '&gt;');
 }
 
-function mark (code, encoded) {
+function encodeHtmlMarks (code, encoded) {
   var opentag = '<mark>';
   var closetag = '</mark>';
   if (encoded) {
@@ -66,7 +100,7 @@ function mark (code, encoded) {
   return code.replace(ropen, open).replace(rclose, close);
 }
 
-function unmark (value, inCode) {
+function decodeHtmlMarks (value, inCode) {
   var ropen = /highlightmarkisveryliteral/g;
   var rclose = /highlightmarkwasveryliteral/g;
   var classes = 'md-mark' + (inCode ? ' md-code-mark' : '');
@@ -98,27 +132,75 @@ function heading (tokens, i, options, env, renderer) {
   }
 }
 
-function block () {
+function block (tokens, idx, options, env) {
   var base = baseblock.apply(this, arguments).substr(11); // starts with '<pre><code>'
-  var left = base.substr(0, base.length - 14);
-  var marked = highlight(true, base);
-  var classed = '<pre class="md-code-block"><code class="md-code">' + marked + '</code></pre>';
+  var untagged = base.substr(0, base.length - 14);
+  var upmarked = upmark(tokens[idx], untagged, 0, env);
+  var marked = highlight(true, upmarked);
+  var classed = '<pre class="md-code-block"><code class="md-code">' + marked + '</code></pre>\n';
   return classed;
 }
 
-function inline () {
+function inline (tokens, idx, options, env) {
   var base = baseinline.apply(this, arguments).substr(6); // starts with '<code>'
-  var left = base.substr(0, base.length - 7); // ends with '</code>'
-  var marked = highlight(true, left);
+  var untagged = base.substr(0, base.length - 7); // ends with '</code>'
+  var upmarked = upmark(tokens[idx], untagged, -1, env);
+  var marked = highlight(true, upmarked);
   var classed = '<code class="md-code md-code-inline">' + marked + '</code>';
   return classed;
 }
 
-function fence () {
+function renderInline (tokens, options, env) {
+  var result = baserenderInline.apply(this, arguments);
+  if (!tokens.length) {
+    return result;
+  }
+  env.flush = true;
+  result += upmark(tokens[tokens.length - 1], '', 0, env);
+  env.flush = false;
+  return result;
+}
+
+function upmark (token, content, offset, env) {
+  return env.markers
+    .filter(pastOrPresent)
+    .reverse()
+    .reduce(considerUpmarking, content);
+
+  function considerUpmarking (content, marker) {
+    var start = env.flush ? 0 : Math.max(marker[0], token.cursorStart);
+    var markerCode = consumeMarker(marker, env);
+    return (
+      content.slice(0, start + offset) +
+        markerCode +
+      content.slice(start + offset)
+    );
+  }
+
+  function pastOrPresent (marker) {
+    return marker[0] <= token.cursorEnd
+  }
+}
+
+function consumeMarker (marker, env) {
+  var code = randomCode() + randomCode() + randomCode();
+  env.markers.splice(env.markers.indexOf(marker), 1);
+  env.markerCodes.push([code, marker[1]]);
+  return code;
+}
+
+function randomCode () {
+  return Math.random().toString(18).substr(2).replace(/\d+/g, '');
+}
+
+function fence (tokens, idx, options, env) {
   var base = basefence.apply(this, arguments).substr(5); // starts with '<pre>'
   var lang = base.substr(0, 6) !== '<code>'; // when the fence has a language class
-  var rest = lang ? base : '<code class="md-code">' + base.substr(6);
-  var classed = '<pre class="md-code-block">' + rest;
+  var untaggedStart = lang ? base.indexOf('>') + 1 : 6;
+  var untagged = base.substr(untaggedStart);
+  var upmarked = upmark(tokens[idx], untagged, 0, env);
+  var codeTag = lang ? base.substr(0, untaggedStart) : '<code class="md-code">';
+  var classed = '<pre class="md-code-block">' + codeTag + upmarked;
   var aliased = classed.replace(ralias, aliasing);
   return aliased;
 }
@@ -132,27 +214,34 @@ function aliasing (all, language) {
   return ' class="md-code ' + lang + '"';
 }
 
-function textparser (tokenizers) {
-  return function parseText () {
-    var base = basetext.apply(this, arguments);
-    var fancy = fanciful(base);
-    var tokenized = tokenize(fancy, tokenizers);
-    return tokenized;
-  };
+function textParser (tokens, idx, options, env) {
+  var token = tokens[idx];
+  token.content = upmark(token, token.content, tokens.slice(0, idx).reduce(countMarks, 0), env);
+  var base = basetext.apply(this, arguments);
+  var fancy = fancifulLong(fancifulShort(base));
+  var tokenized = tokenize(fancy, env.tokenizers);
+  return tokenized;
+  function countMarks (acc, token) {
+    return acc - (token.markup ? token.markup.length : 0);
+  }
 }
 
-function fanciful (text) {
+function fancifulShort (text) {
   return text
-    .replace(/--/g, '\u2014')                            // em-dashes
     .replace(/(^|[-\u2014/(\[{"\s])'/g, '$1\u2018')      // opening singles
     .replace(/'/g, '\u2019')                             // closing singles & apostrophes
     .replace(/(^|[-\u2014/(\[{\u2018\s])"/g, '$1\u201c') // opening doubles
-    .replace(/"/g, '\u201d')                             // closing doubles
+    .replace(/"/g, '\u201d');                            // closing doubles
+}
+
+function fancifulLong (text) {
+  return text
+    .replace(/--/g, '\u2014')                            // em-dashes
     .replace(/\.{3}/g, '\u2026');                        // ellipses
 }
 
 function linkifyTokenizer (state) {
-  tokenizeLinks(state, context);
+  tokenizeLinks(state, state.env);
 }
 
 function tokenize (text, tokenizers) {
@@ -162,16 +251,33 @@ function tokenize (text, tokenizers) {
   }
 }
 
+function decodeMarkers (html, env) {
+  return env.markerCodes.reduce(reducer, html);
+  function reducer (html, mcp) {
+    return html.replace(mcp[0], mcp[1]);
+  }
+}
+
 function markdown (input, options) {
   var tok = options.tokenizers || [];
   var lin = options.linkifiers || [];
   var valid = input === null || input === void 0 ? '' : String(input);
-  context.tokenizers = tok;
-  context.linkifiers = lin;
-  md.renderer.rules.text = tok.length ? textparser(tok) : textcached;
-  var html = md.render(valid);
-  return unmark(mark(html));
+  var env = {
+    tokenizers: tok,
+    linkifiers: lin,
+    markers: options.markers ? options.markers.sort(asc) : [],
+    markerCodes: []
+  };
+  md.renderer.rules.text = textParser;
+  var leftMark = upmark({ cursorStart: 0, cursorEnd: 0 }, '', 0, env);
+  var htmlMd = md.render(valid, env);
+  env.flush = true;
+  var rightMark = upmark({ cursorStart: 0, cursorEnd: Infinity }, '', 0, env);
+  var html = leftMark + htmlMd + rightMark;
+  return decodeMarkers(decodeHtmlMarks(encodeHtmlMarks(html)), env);
 }
+
+function asc (a, b) { return a[0] - b[0]; }
 
 markdown.parser = md;
 markdown.languages = languages;
