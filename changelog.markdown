@@ -1,4 +1,4 @@
-# 3.2.3 Cyrillic
+# 3.2.4 Cyrillic
 
 - Added `sh`, `shell` and `zsh` aliases for `bash` language
 

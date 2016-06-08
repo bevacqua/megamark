@@ -1,6 +1,6 @@
 {
   "name": "megamark",
-  "version": "3.2.2",
+  "version": "3.2.3",
   "description": "Markdown with easy tokenization, a fast highlighter, and a lean HTML sanitizer",
   "homepage": "https://github.com/bevacqua/megamark",
   "main": "dist/megamark.js",
