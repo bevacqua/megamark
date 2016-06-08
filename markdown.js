@@ -17,7 +17,10 @@ var aliases = {
   js: 'javascript',
   md: 'markdown',
   html: 'xml', // next best thing
-  jade: 'css' // next best thing
+  jade: 'css', // next best thing
+  zsh: 'bash', // next best thing
+  shell: 'bash', // next best thing
+  sh: 'bash' // next best thing
 };
 
 md.core.ruler.after('linkify', 'pos_counter', function posCounter (state) {

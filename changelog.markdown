@@ -1,3 +1,7 @@
+# 3.2.3 Cyrillic
+
+- Added `sh`, `shell` and `zsh` aliases for `bash` language
+
 # 3.2.2 Mark Zuckerberg
 
 - Fixed a number of issues with `markers` option, added tons of tests
