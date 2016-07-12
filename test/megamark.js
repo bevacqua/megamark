@@ -226,6 +226,6 @@ test('megamark understands markers in complex markdown', function (t) {
 });
 
 test('megamark ignores html in code', function (t) {
-  t.equal(megamark('```\nvar a = 1;\n\n<!DOCTYPE html>\n<html>\n<span>foo</span>\n</html>\n```'), '<pre class="md-code-block"><code class="md-code">var a = 1;\n\n<!DOCTYPE html>\n<html>\n<span>foo</span>\n</html>\n</code></pre>\n');
+  t.equal(megamark('```\nvar a = 1;\n\n<!DOCTYPE html>\n<html>\n<span>foo</span>\n</html>\n```'), '<pre class="md-code-block"><code class="md-code">var a = 1;\n\n&#x3C;!DOCTYPE html&#x3E;\n&#x3C;html&#x3E;\n&#x3C;span&#x3E;foo&#x3C;/span&#x3E;\n&#x3C;/html&#x3E;\n</code></pre>\n');
   t.end();
 });
