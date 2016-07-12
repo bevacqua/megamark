@@ -226,6 +226,15 @@ test('megamark understands markers in complex markdown', function (t) {
 });
 
 test('megamark ignores html in code', function (t) {
-  t.equal(megamark('```\nvar a = 1;\n\n<!DOCTYPE html>\n<html>\n<span>foo</span>\n</html>\n```'), '<pre class="md-code-block"><code class="md-code">var a = 1;\n\n&#x3C;!DOCTYPE html&#x3E;\n&#x3C;html&#x3E;\n&#x3C;span&#x3E;foo&#x3C;/span&#x3E;\n&#x3C;/html&#x3E;\n</code></pre>\n');
+  t.equal(megamark('`<strong>bar</strong>`'),
+    '<p><code class="md-code md-code-inline">&lt;strong&gt;bar&lt;/strong&gt;</code></p>\n');
+
+  t.equal(megamark('`<mark>foo</mark> asd asd  <strong>bar</strong>`'),
+    '<p><code class="md-code md-code-inline"><mark class="md-mark md-code-mark">foo</mark> asd asd &lt;strong&gt;bar&lt;/strong&gt;</code></p>\n');
+  t.equal(megamark('    <mark>foo</mark> asd asd  <strong>bar</strong>'),
+    '<pre class="md-code-block"><code class="md-code"><mark class="md-mark md-code-mark">foo</mark> asd asd  &lt;strong&gt;bar&lt;/strong&gt;</code></pre>\n');
+
+  t.equal(megamark('    <!doctype html>\n    <html><div>foo</div></html>'),
+    '<pre class="md-code-block"><code class="md-code">&lt;!doctype html&gt;\n&lt;html&gt;&lt;div&gt;foo&lt;/div&gt;&lt;/html&gt;</code></pre>\n');
   t.end();
 });
