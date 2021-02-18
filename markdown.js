@@ -74,6 +74,19 @@ md.core.ruler.after('linkify', 'pos_counter', function posCounter (state) {
     return true;
   }
 
+  function moveCursorAfterMatch (needle) {
+    var regex = needle instanceof RegExp;
+    var re = regex ? needle : new RegExp('^\\s*' + escapeForRegExp(needle), 'ig');
+    var match = re.exec(partial);
+    if (!match) {
+      return false;
+    }
+    var diff = match[0].length;
+    cursor += diff;
+    partial = partial.slice(diff);
+    return true;
+  }
+
   function moveCursorAfterLinkClose () {
     moveCursor(']');
     if (!moveCursor(/^\s*\[[^\]]+\]/g)) {
