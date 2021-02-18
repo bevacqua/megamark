@@ -34,6 +34,9 @@ md.core.ruler.after('linkify', 'pos_counter', function posCounter (state) {
     if (token.type === 'hardbreak') {
       moveCursor('  \n');
     }
+    if (token.type === 'list_item_open') {
+      moveCursorAfterMatch(/^\s*\d+\. /g);
+    }
     if (token.type === 'link_open') {
       moveCursor('[');
     }
